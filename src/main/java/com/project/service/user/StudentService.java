@@ -71,6 +71,20 @@ public class StudentService {
         //!!! unique kontrolü
         uniquePropertyValidator.checkUniqueProperties(student, studentRequest);
 
+        student.setMotherName(studentRequest.getMotherName());
+        student.setFatherName(studentRequest.getFatherName());
+        student.setBirthDay(studentRequest.getBirthDay());
+        student.setEmail(studentRequest.getEmail());
+        student.setPhoneNumber(studentRequest.getPhoneNumber());
+        student.setBirthPlace(studentRequest.getBirthPlace());
+        student.setGender(studentRequest.getGender());
+        student.setName(studentRequest.getName());
+        student.setSurname(studentRequest.getSurname());
+        student.setSsn(student.getSsn());
 
+        userRepository.save(student);
+        String message = SuccessMessages.STUDENT_UPDATED;
+
+        return ResponseEntity.ok(message);
     }
 }
