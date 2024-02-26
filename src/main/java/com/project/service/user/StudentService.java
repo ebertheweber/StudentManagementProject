@@ -12,6 +12,7 @@ import com.project.repository.user.UserRepository;
 import com.project.service.helper.MethodHelper;
 import com.project.service.validator.UniquePropertyValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -86,5 +87,48 @@ public class StudentService {
         String message = SuccessMessages.STUDENT_UPDATED;
 
         return ResponseEntity.ok(message);
+    }
+
+    public ResponseMessage<StudentResponse> updateStudentForManagers(Long userId, StudentRequest studentRequest) {
+
+        User user = methodHelper.isUserExist(userId);
+        //!!! istekten gelen user'ın rolü student mı?
+        methodHelper.checkRole(user,RoleType.STUDENT);
+        //!!! unique kontrolü
+        uniquePropertyValidator.checkUniqueProperties(user, studentRequest);
+
+        user.setName(studentRequest.getName());
+        user.setSurname(studentRequest.getSurname());
+        user.setBirthDay(studentRequest.getBirthDay());
+        user.setBirthPlace(studentRequest.getBirthPlace());
+        user.setSsn(studentRequest.getSsn());
+        user.setEmail(studentRequest.getEmail());
+        user.setPhoneNumber(studentRequest.getPhoneNumber());
+        user.setGender(studentRequest.getGender());
+        user.setMotherName(studentRequest.getMotherName());
+        user.setFatherName(studentRequest.getFatherName());
+        user.setPassword(passwordEncoder.encode(studentRequest.getPassword()));
+        user.setAdvisorTeacherId(studentRequest.getAdvisorTeacherId());
+
+        return ResponseMessage.<StudentResponse>builder()
+                .message(SuccessMessages.STUDENT_UPDATED)
+                .object(userMapper.mapUserToStudentResponse(userRepository.save(user)))
+                .httpStatus(HttpStatus.OK)
+                .build();
+
+    }
+
+    public ResponseMessage changeStatusOfStudent(Long studentId, boolean status) {
+
+        User student = methodHelper.isUserExist(studentId);
+        methodHelper.checkRole(student, RoleType.STUDENT);
+
+        student.setActive(status);
+        userRepository.save(student);
+
+        return ResponseMessage.builder()
+                .message("Student is " + (status ? "active" : "passive"))
+                .httpStatus(HttpStatus.OK)
+                .build();
     }
 }

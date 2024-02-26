@@ -38,4 +38,24 @@ public class StudentController {
         return studentService.updateStudent(studentRequestWithoutPassword,request);
     }
 
+    //!!! Yoneticilerin bir ogrencinin bilgilerini guncelliyecegi metod
+    @PutMapping("/update/{userId}")// http://localhost:8080/student/update/2 + PUT + JSON
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public ResponseMessage<StudentResponse> updateStudentForManagers(
+            @PathVariable Long userId ,
+            @RequestBody @Valid StudentRequest studentRequest ){
+
+        return studentService.updateStudentForManagers(userId, studentRequest);
+    }
+
+    //!!! Student'ların status degerini değiştiren metod
+    @GetMapping("/changeStatus") // http://localhost:8080/student/changeStatus?id=3&status=true
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public ResponseMessage changeStatusOfStudent(@RequestParam Long id, @RequestParam boolean status){
+
+        return studentService.changeStatusOfStudent(id, status);
+    }
+
+    // TODO : addLessonProgramToStudentLessonsProgram **********************
+
 }
