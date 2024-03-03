@@ -64,6 +64,24 @@ public class LessonProgramController {
     }
 
     // bir Ogrenci kendine ait lessonProgramlari getiriyor
+    @GetMapping("/getAllLessonProgramByStudent") // http://localhost:8080/lessonPrograms/getAllLessonProgramByStudent
+    @PreAuthorize("hasAnyAuthority('STUDENT')")
+    public Set<LessonProgramResponse> getAllLessonProgramByStudent(HttpServletRequest httpServletRequest){
+        return lessonProgramService.getAllLessonProgramByUser(httpServletRequest);
+    }
+
+    @GetMapping("/getAllLessonProgramByTeacherId/{teacherId}") // http://localhost:8080/lessonPrograms/getAllLessonProgramByTeacherId/3
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public Set<LessonProgramResponse> getByTeacherId(@PathVariable Long teacherId){
+        return lessonProgramService.getByTeacherId(teacherId);
+    }
+
+    @GetMapping("/getAllLessonProgramByStudentId/{studentId}") // http://localhost:8080/lessonPrograms/getAllLessonProgramByStudentId/3
+    @PreAuthorize("hasAnyAuthority('ADMIN','MANAGER','ASSISTANT_MANAGER')")
+    public Set<LessonProgramResponse> getByStudentId(@PathVariable Long studentId){
+        return lessonProgramService.getByStudentId(studentId);
+    }
+
 
 
 }
