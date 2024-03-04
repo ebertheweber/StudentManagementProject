@@ -14,6 +14,8 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsernameEquals(String username);
 
+
+
     boolean existsByUsername(String username);
 
     boolean existsBySsn(String ssn);
@@ -44,4 +46,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT MAX (u.studentNumber) FROM User u")
     int getMaxStudentNumber();
+
+    User findByUsername(String teacherUsername);
+
 }
