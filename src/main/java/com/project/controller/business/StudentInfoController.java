@@ -6,6 +6,9 @@ import com.project.payload.response.business.ResponseMessage;
 import com.project.payload.response.business.StudentInfoResponse;
 import com.project.service.business.StudentInfoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +34,7 @@ public class StudentInfoController {
     public ResponseMessage delete(@PathVariable Long studentInfoId){
         return studentInfoService.deleteStudentInfo(studentInfoId);
     }
-
+    // TODO student info
     // NOT: ODEV ---> getAllWithPage    yöneticiler tetikleyecek    / getAllStudentInfoByPage
 
     // NOT: ODEV ---> getStudentInfoByStudentId() yoneticiler tetikleyecek     /getByuStudentId/{studentId}
@@ -45,4 +48,25 @@ public class StudentInfoController {
         return studentInfoService.update(studentInfoRequest, studentInfoId);
     }
 
+    // !!! -> Bir ogretmen kendi ogrencilerinin bilgilerini almak isterse :
+    @GetMapping("/getAllForTeacher") // http://localhost:8080/studentInfo/getAllForTeacher
+    @PreAuthorize("hasAnyAuthority('TEACHER')")
+    public ResponseEntity<Page<StudentInfoResponse>> getAllForTeacher(
+            HttpServletRequest httpServletRequest,
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "size") int size
+    ) {
+        return new ResponseEntity<>(studentInfoService.getAllForTeacher(httpServletRequest, page, size), HttpStatus.OK);
+    }
+
+    // !!! --> bir ogrenci kendi bilgilerini almak isterse
+    @GetMapping("/getAllForStudent") // http://localhost:8080/studentInfo/getAllForStudent
+    @PreAuthorize("hasAnyAuthority('STUDENT')")
+    public ResponseEntity<Page<StudentInfoResponse>> getAllForStudent(
+            HttpServletRequest httpServletRequest,
+            @RequestParam(value = "page") int page,
+            @RequestParam(value = "size") int size
+    ) {
+        return new ResponseEntity<>(studentInfoService.getAllForStudent(httpServletRequest, page, size), HttpStatus.OK);
+    }
 }

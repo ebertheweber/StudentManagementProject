@@ -17,9 +17,12 @@ import com.project.payload.response.business.ResponseMessage;
 import com.project.payload.response.business.StudentInfoResponse;
 import com.project.repository.business.StudentInfoRepository;
 import com.project.service.helper.MethodHelper;
+import com.project.service.helper.PageableHelper;
 import com.project.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +38,7 @@ public class StudentInfoService {
     private final LessonService lessonService;
     private final EducationTermService educationTermService;
     private final StudentInfoMapper studentInfoMapper;
+    private final PageableHelper pageableHelper;
 
     @Value("${midterm.exam.impact.percentage}")
     private Double midtermExamPercentage;
@@ -144,9 +148,37 @@ public class StudentInfoService {
         Double noteAverage = calculateExamAverage(studentInfoRequest.getMidtermExam(), studentInfoRequest.getFinalExam());
         Note note = checkLetterGrade(noteAverage);
         //!!! DTO --> POJO
+        StudentInfo studentInfoUpdate =
+                studentInfoMapper.mapStudentInfoUpdateToStudentInfo(studentInfoRequest,studentInfoId,lesson,
+                        educationTerm,note,noteAverage);
+        studentInfoUpdate.setTeacher(studentInfo.getTeacher());
+        studentInfoUpdate.setStudent(studentInfo.getStudent());
 
+        StudentInfo updatedStudentInfo =  studentInfoRepository.save(studentInfoUpdate);
+
+        return ResponseMessage.<StudentInfoResponse>builder()
+                .message(SuccessMessages.STUDENT_INFO_UPDATE)
+                .httpStatus(HttpStatus.OK)
+                .object(studentInfoMapper.mapStudentInfoToStudentInfoResponse(updatedStudentInfo))
+                .build();
     }
 
 
+    public Page<StudentInfoResponse> getAllForTeacher(HttpServletRequest httpServletRequest, int page, int size) {
 
+        Pageable pageable = pageableHelper.getPageableWithProperties(page,size);
+        String userName = (String) httpServletRequest.getAttribute("username");
+
+        return studentInfoRepository.findByTeacherId_UsernameEquals(userName,pageable)
+                .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
+    }
+
+
+    public Page<StudentInfoResponse> getAllForStudent(HttpServletRequest httpServletRequest, int page, int size) {
+        Pageable pageable = pageableHelper.getPageableWithProperties(page,size);
+        String userName = (String) httpServletRequest.getAttribute("username");
+
+        return studentInfoRepository.findByStudentId_UsernameEquals(userName,pageable)
+                .map(studentInfoMapper::mapStudentInfoToStudentInfoResponse);
+    }
 }
