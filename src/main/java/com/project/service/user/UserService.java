@@ -199,4 +199,14 @@ public class UserService {
     public User getTeacherByUsername(String teacherUsername){
         return userRepository.findByUsername(teacherUsername);
     }
+
+    public User getUserByUserId(Long userId) {
+
+        return userRepository.findById(userId).orElseThrow(()->
+                new ResourceNotFoundException(ErrorMessages.NOT_FOUND_USER_MESSAGE));
+    }
+
+    public List<User> getStudentById(Long[] studentIds) {
+        return userRepository.findByIdsEquals(studentIds);
+    }
 }

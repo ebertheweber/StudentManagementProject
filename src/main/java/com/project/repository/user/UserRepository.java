@@ -49,4 +49,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByUsername(String teacherUsername);
 
+    @Query("SELECT u FROM User u WHERE u.id IN :studentIds")
+    List<User> findByIdsEquals(Long[] studentIds);
 }

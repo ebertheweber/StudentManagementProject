@@ -33,7 +33,7 @@ public class Meet {
     private LocalTime startTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "HH:mm", timezone = "US")
-    private LocalTime endTime;
+    private LocalTime stopTime;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     private User advisoryTeacher;
